@@ -1,3 +1,5 @@
+require("helpers.constants")
+
 local entityHandler = require("helpers.entity_handler")
 local tick          = require("libraries.tick")
 local keyboard      = require("helpers.keyboard")
@@ -33,8 +35,8 @@ function game.load()
     game.editor:setPlayer(game.player)
 
     -- tuning
-    game.maxDt = 0.1
-    game.step  = 1 / 120
+    game.maxDt = MAXDT
+    game.step  = STEP
 end
 
 function game.update(dt)

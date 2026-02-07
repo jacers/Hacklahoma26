@@ -25,4 +25,7 @@ PLAYER            = {
     JUMP_BUFFER = 0.10,
 }
 
+MAXDT = 0.1
+STEP  = 1 / 120
+
 return true

@@ -1,13 +1,14 @@
 local Rectangle = require("entities.rectangle")
 local Sheep     = require("entities.sheep")
+local camera    = require("helpers.camera")
 require("helpers.constants")
 
 local editor = {}
 
 function editor.new(entityHandler, keyboard, window)
-    local self = {}
+    local self        = {}
 
-    self.spawnTools = {
+    self.spawnTools   = {
         spawn_rectangle = {
             label = "Rectangle",
             factory = function(x, y) return Rectangle(x, y, 160, 32) end
@@ -23,7 +24,7 @@ function editor.new(entityHandler, keyboard, window)
     self.spawnLabel   = ""
     self.activeEntity = nil
 
-    self.player = nil -- set by game
+    self.player       = nil -- set by game
 
     function self:setPlayer(p)
         self.player = p
@@ -50,9 +51,9 @@ function editor.new(entityHandler, keyboard, window)
         local dx, dy = 0, 0
         local speed = EDITOR_MOVE_SPEED
 
-        if keyboard.pressed("up")    then dy = dy - speed * dt end
-        if keyboard.pressed("down")  then dy = dy + speed * dt end
-        if keyboard.pressed("left")  then dx = dx - speed * dt end
+        if keyboard.pressed("up") then dy = dy - speed * dt end
+        if keyboard.pressed("down") then dy = dy + speed * dt end
+        if keyboard.pressed("left") then dx = dx - speed * dt end
         if keyboard.pressed("right") then dx = dx + speed * dt end
 
         if dx ~= 0 or dy ~= 0 then
@@ -69,6 +70,8 @@ function editor.new(entityHandler, keyboard, window)
         if self.spawnMode and self.spawnFactory then
             local mx, my = love.mouse.getPosition()
             local vx, vy = window.screenToWorld(mx, my)
+            local cx, cy = camera.getDrawOffset()
+            vx, vy = vx + cx, vy + cy
 
             local preview = self.spawnFactory(vx, vy)
             preview.x = vx - preview.width / 2
@@ -130,6 +133,8 @@ function editor.new(entityHandler, keyboard, window)
         end
 
         local vx, vy = window.screenToWorld(x, y)
+        local cx, cy = camera.getDrawOffset()
+        vx, vy = vx + cx, vy + cy
 
         if self.spawnMode and button == 1 and self.spawnFactory then
             local ent = self.spawnFactory(vx, vy)

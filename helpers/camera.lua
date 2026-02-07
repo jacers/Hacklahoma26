@@ -6,7 +6,7 @@ camera.y = 0
 camera.target = nil
 camera.smoothing = 12 -- higher = snappier
 
-camera.bounds = nil -- { x, y, w, h }
+camera.bounds = nil   -- { x, y, w, h }
 camera.viewW = nil
 camera.viewH = nil
 
@@ -66,6 +66,12 @@ end
 function camera.reset(x, y)
     camera.x = x or 0
     camera.y = y or 0
+end
+
+-- Allows mouse to draw things based off the camera offset
+-- Without this, mouse clicks happen in weird ways
+function camera.getDrawOffset()
+    return math.floor(camera.x), math.floor(camera.y)
 end
 
 return camera
