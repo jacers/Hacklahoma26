@@ -108,8 +108,8 @@ function love.keypressed(key)
         return
     end
 
-    if key == "space" and player and not spawnMode then
-        player:jump()
+    if player and not spawnMode and keyboard.keypressed(key, "jump") then
+        player:queueJump()
     end
 
     -- Toggle spawn tools

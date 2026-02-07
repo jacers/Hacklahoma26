@@ -1,27 +1,39 @@
-local BaseEntity = require("entities.entity")
+local BaseEntity    = require("entities.entity")
 local entityHandler = require("helpers.entity_handler")
-local keyboard = require("helpers.keyboard")
+local keyboard      = require("helpers.keyboard")
 
-local Player = BaseEntity:extend()
+local Player        = BaseEntity:extend()
 
 function Player:new(x, y)
     BaseEntity.new(self, "Player", x, y)
 
     -- Size (no sprite yet)
-    self.width    = 16
-    self.height   = 16 -- Mario-sized!
+    self.width         = 16
+    self.height        = 16 -- Mario-sized!
 
     -- Physics state
-    self.vx       = 0
-    self.vy       = 0
-    self.onGround = false
+    self.vx            = 0
+    self.vy            = 0
+    self.onGround      = false
 
-    -- Tuning
-    self.accel    = 2200
-    self.maxSpeed = 260
-    self.friction = 1800
-    self.gravity  = 2200
-    self.jumpVel  = 720
+    -- Movement
+    self.walkSpeed     = 180
+    self.runSpeed      = 300
+    self.accelGround   = 3000
+    self.accelAir      = 1400
+    self.friction      = 2400
+
+    -- Gravity / Jump
+    self.gravity       = 2600
+    self.jumpVel       = 760
+    self.fallMult      = 1.35 -- Faster fall than rise
+    self.lowJumpMult   = 1.8  -- Short hop when you release jump early
+
+    -- Polish
+    self.coyoteTimeMax = 0.10
+    self.jumpBufferMax = 0.10
+    self.coyoteTime    = 0
+    self.jumpBuffer    = 0
 end
 
 local function approach(v, target, amount)
@@ -39,32 +51,57 @@ function Player:update(dt)
     if keyboard.pressed("left") then move = move - 1 end
     if keyboard.pressed("right") then move = move + 1 end
 
-    -- Horizontal accel / friction
+    local runHeld     = keyboard.pressed("run")
+    local holdingJump = keyboard.pressed("jump")
+
+    local targetMax   = runHeld and self.runSpeed or self.walkSpeed
+    local accel       = self.onGround and self.accelGround or self.accelAir
+
+    -- Horizontal accel / friction (reduced air braking)
     if move ~= 0 then
-        self.vx = self.vx + move * self.accel * dt
-        self.vx = math.max(-self.maxSpeed, math.min(self.vx, self.maxSpeed))
+        self.vx = self.vx + move * accel * dt
+        self.vx = math.max(-targetMax, math.min(self.vx, targetMax))
     else
-        self.vx = approach(self.vx, 0, self.friction * dt)
+        if self.onGround then
+            self.vx = approach(self.vx, 0, self.friction * dt)
+        end
     end
 
-    -- Gravity
-    self.vy = self.vy + self.gravity * dt
+    -- Variable jump gravity (Mario-like)
+    local g = self.gravity
+    if self.vy > 0 then
+        g = g * self.fallMult
+    elseif self.vy < 0 and not holdingJump then
+        g = g * self.lowJumpMult
+    end
+    self.vy = self.vy + g * dt
 
     -- Integrate + resolve collisions
-    local hit = entityHandler.movePlatformer(
-        self,
-        self.vx * dt,
-        self.vy * dt
-    )
+    local hit = entityHandler.movePlatformer(self, self.vx * dt, self.vy * dt)
 
+    -- Grounding + coyote timer
     self.onGround = hit.ground
-end
-
-function Player:jump()
     if self.onGround then
+        self.coyoteTime = self.coyoteTimeMax
+    else
+        self.coyoteTime = math.max(0, self.coyoteTime - dt)
+    end
+
+    -- Jump buffer countdown
+    self.jumpBuffer = math.max(0, self.jumpBuffer - dt)
+
+    -- Execute buffered jump if allowed (buffer + coyote)
+    if self.jumpBuffer > 0 and self.coyoteTime > 0 then
         self.vy = -self.jumpVel
         self.onGround = false
+        self.jumpBuffer = 0
+        self.coyoteTime = 0
     end
+end
+
+-- Call this from love.keypressed (or when jump is pressed once)
+function Player:queueJump()
+    self.jumpBuffer = self.jumpBufferMax
 end
 
 function Player:draw()
