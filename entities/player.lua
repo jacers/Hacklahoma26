@@ -103,17 +103,32 @@ function Player:update(dt)
     local targetMax   = runHeld and self.runSpeed or self.walkSpeed
     local accel       = self.onGround and self.accelGround or self.accelAir
 
+    -- Turnaround / skid check (compute early so we can affect physics)
+    local turning = false
+    if self.onGround and runHeld and not lockHorizontal then
+        if (move < -0.2 and self.vx > 60) or (move > 0.2 and self.vx < -60) then
+            turning = true
+        end
+    end
+
     -- Horizontal accel / friction
-    if move ~= 0 then
+    if move ~= 0 and not turning and not lockHorizontal then
         self.vx = self.vx + move * accel * dt
         self.vx = math.max(-targetMax, math.min(self.vx, targetMax))
     else
         if self.onGround then
-            -- If we're grounded AND holding up/down, let it "slide" a bit (reduced friction)
             local friction = self.friction
+
+            -- Less = more slide when holding up/down
             if lockHorizontal then
-                friction = friction * 0.45
+                friction = friction * 0.25
             end
+
+            -- Less = more sliding when turning
+            if turning then
+                friction = friction * 0.3
+            end
+
             self.vx = approach(self.vx, 0, friction * dt)
         end
     end
@@ -158,14 +173,6 @@ function Player:update(dt)
         self.anim.flipX = false
     end
 
-    -- Turnaround / skid check
-    local turning = false
-    if self.onGround and runHeld and not lockHorizontal then
-        if (move < -0.2 and self.vx > 60) or (move > 0.2 and self.vx < -60) then
-            turning = true
-        end
-    end
-
     -- State priority
     if not self.onGround then
         if self.vy < 0 then
@@ -200,7 +207,6 @@ function Player:queueJump()
 end
 
 function Player:draw()
-    -- draw centered on your player box (optional)
     local ox = self.anim.frameW / 2
     local oy = self.anim.frameH / 2
     self.anim:draw(self.x + self.width / 2, self.y + self.height / 2, 0, 1, 1, ox, oy)
