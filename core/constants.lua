@@ -17,8 +17,8 @@ PLAYER            = {
     ACCEL_GROUND        = 3000,
     ACCEL_AIR           = 1000,
     FRICTION            = 1500,
-    GRAVITY             = 3000,
-    JUMP_VEL            = 760,
+    GRAVITY             = 3100,
+    JUMP_VEL            = 800,
     FALL_MULT           = 1.35,
     LOW_JUMP_MULT       = 1.8,
     COYOTE_TIME         = 0.10,
@@ -42,7 +42,9 @@ CAMERA            = {
         MAX_X = 96,
         MAX_Y = 64,
         DEADZONE = 0.25,
-        SMOOTHING = 18,
+        SMOOTHING = 40,
+        REUTRN_SMOOTHING = 95,
+        SNAP_EPSILON = 2.0,
     },
 
     ZOOM             = {
@@ -51,7 +53,7 @@ CAMERA            = {
     },
 
     VERTICAL         = {
-        DEADZONE_FRAC = 0.3, -- size of deadzone as fraction of viewport height (0.25 = 25%)
+        DEADZONE_FRAC = 0.3,  -- size of deadzone as fraction of viewport height (0.25 = 25%)
         BIAS_FRAC     = 0.05, -- shifts deadzone slightly downward so you see more above (optional)
         MAX_STEP      = 220,  -- max pixels/sec camera can correct vertically (prevents drastic jumps)
         SMOOTHING     = 8,    -- vertical follow smoothing (lower = looser)
