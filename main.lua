@@ -2,6 +2,8 @@ local scene = require("scenes.gameplay.scene")
 
 function love.load()
     scene.load()
+    love.graphics.setDefaultFilter("nearest", "nearest", 1)
+    love.graphics.setLineStyle("rough")
 end
 
 function love.update(dt)
