@@ -1,7 +1,7 @@
 local Rectangle = require("entities.rectangle")
 local Sheep     = require("entities.sheep")
-local camera    = require("helpers.camera")
-require("helpers.constants")
+local camera    = require("core.camera")
+require("core.constants")
 
 local editor = {}
 

@@ -1,4 +1,4 @@
-require("helpers.constants")
+require("core.constants")
 local S = SCREEN
 
 local window   = {}

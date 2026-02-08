@@ -4,7 +4,7 @@ local Sheep = BaseEntity:extend()
 
 function Sheep:new(x, y)
     BaseEntity.new(self, "Sheep", x, y)
-    self:setImage(love.graphics.newImage("images/sheep.png"))
+    self:setImage(love.graphics.newImage("assets/images/sheep.png"))
 end
 
 function Sheep:update(dt)

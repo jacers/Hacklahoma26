@@ -1,4 +1,4 @@
-local gamepad = require("helpers.controls.gamepad")
+local gamepad = require("core.input.gamepad")
 
 local keyboard = {}
 

@@ -1,13 +1,13 @@
-require("helpers.constants")
+require("core.constants")
 
 local entityHandler = require("helpers.entity_handler")
 local tick          = require("libraries.tick")
 
-local keyboard      = require("helpers.controls.keyboard")
-local gamepad       = require("helpers.controls.gamepad")
+local keyboard      = require("core.input.keyboard")
+local gamepad       = require("core.input.gamepad")
 
-local window        = require("helpers.window")
-local camera        = require("helpers.camera")
+local window        = require("core.window")
+local camera        = require("core.camera")
 
 local levelManager  = require("game.level_manager")
 local editorFactory = require("game.editor")

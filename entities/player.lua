@@ -1,10 +1,10 @@
-require("helpers.constants")
+require("core.constants")
 local P = PLAYER
 
 local BaseEntity    = require("entities.entity")
 local entityHandler = require("helpers.entity_handler")
-local keyboard      = require("helpers.controls.keyboard")
-local gamepad       = require("helpers.controls.gamepad")
+local keyboard      = require("core.input.keyboard")
+local gamepad       = require("core.input.gamepad")
 
 local Player = BaseEntity:extend()
 
