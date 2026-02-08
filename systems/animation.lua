@@ -21,24 +21,24 @@ function Animation.new(imagePath, opts)
     self.image = love.graphics.newImage(imagePath)
     self.image:setFilter("nearest", "nearest")
 
-    self.frameW  = opts.frameW  or 24
-    self.frameH  = opts.frameH  or 24
-    self.border  = opts.border  or 1
+    self.frameW  = opts.frameW or 24
+    self.frameH  = opts.frameH or 24
+    self.border  = opts.border or 1
     self.spacing = opts.spacing or 1
-    self.count   = opts.count   or 23
+    self.count   = opts.count or 23
 
-    self.quads = buildQuads(self.image, self.frameW, self.frameH, self.border, self.spacing, self.count)
+    self.quads   = buildQuads(self.image, self.frameW, self.frameH, self.border, self.spacing, self.count)
 
-    self.time   = 0
-    self.index  = 1
+    self.time    = 0
+    self.index   = 1
     self.playing = true
-    self.flipX  = false
+    self.flipX   = false
 
     -- current "clip"
-    self.clip = { frames = { 1 }, fps = 1, loop = true }
+    self.clip    = { frames = { 1 }, fps = 1, loop = true }
 
     -- named clips (filled by user)
-    self.clips = {}
+    self.clips   = {}
 
     return self
 end
@@ -101,19 +101,19 @@ function Animation:update(dt)
 end
 
 function Animation:draw(x, y, r, sx, sy, ox, oy)
-    r  = r  or 0
-    sx = sx or 1
-    sy = sy or 1
-    ox = ox or 0
-    oy = oy or 0
+    r           = r or 0
+    sx          = sx or 1
+    sy          = sy or 1
+    ox          = ox or 0
+    oy          = oy or 0
 
     local frame = self.clip.frames[self.index]
-    local quad = self.quads[frame]
+    local quad  = self.quads[frame]
     if not quad then return end
 
     if self.flipX then
-        -- flip around origin: draw with negative scale and offset by frame width
-        love.graphics.draw(self.image, quad, x, y, r, -sx, sy, ox + self.frameW, oy)
+        -- Flip around the origin point (ox), so the sprite stays anchored
+        love.graphics.draw(self.image, quad, x, y, r, -sx, sy, ox, oy)
     else
         love.graphics.draw(self.image, quad, x, y, r, sx, sy, ox, oy)
     end
