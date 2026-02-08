@@ -1,23 +1,25 @@
+require("core.constants")
+
 local camera           = {}
 
 camera.x               = 0
 camera.y               = 0
 
 -- Zoom
-camera.scale           = 2
-camera.baseScale       = 2
-camera.minScale        = 0.75
-camera.maxScale        = 2.5
+camera.scale           = CAMERA.DEFAULT_ZOOM
+camera.baseScale       = CAMERA.DEFAULT_ZOOM
+camera.minScale        = CAMERA.MIN_ZOOM
+camera.maxScale        = CAMERA.MAX_ZOOM
 
 camera.zoom            = {
-    amount    = 0.35, -- how much R3 zooms in
-    smoothing = 14,
-    target    = 2
+    amount    = CAMERA.ZOOM.AMOUNT,
+    smoothing = CAMERA.ZOOM.SMOOTHING,
+    target    = CAMERA.DEFAULT_ZOOM
 }
 
 -- Follow behavior
 camera.target          = nil
-camera.smoothing       = 12 -- higher = snappier
+camera.smoothing       = CAMERA.FOLLOW_SMOOTHING
 
 -- Airborne follow (prevents disorienting jump camera)
 camera.air             = {
@@ -37,10 +39,10 @@ camera.viewH           = nil
 -- Look / aim (right stick nudge)
 camera.look            = {
     enabled   = true,
-    maxX      = 96,
-    maxY      = 64,
-    deadzone  = 0.25,
-    smoothing = 18,
+    maxX      = CAMERA.LOOK.MAX_X,
+    maxY      = CAMERA.LOOK.MAX_Y,
+    deadzone  = CAMERA.LOOK.DEADZONE,
+    smoothing = CAMERA.LOOK.SMOOTHING,
     x         = 0,
     y         = 0
 }
@@ -214,11 +216,11 @@ end
 function camera.reset(x, y)
     camera.x = x or 0
     camera.y = y or 0
-    camera.scale = camera.baseScale
-    camera.zoom.target = camera.baseScale
+    camera.baseScale = CAMERA.DEFAULT_ZOOM
+    camera.scale = CAMERA.DEFAULT_ZOOM
+    camera.zoom.target = CAMERA.DEFAULT_ZOOM
     camera.look.x = 0
     camera.look.y = 0
-    camera.lastGroundBaseY = nil
 end
 
 -- Utilities

@@ -31,7 +31,27 @@ PLAYER            = {
     HITBOX_INSET        = 1,
 }
 
-DEBUG             = {
+CAMERA            = {
+    DEFAULT_ZOOM     = 2.64, -- how zoomed in the camera starts
+    MIN_ZOOM         = 0.75,
+    MAX_ZOOM         = 6.0,
+
+    FOLLOW_SMOOTHING = 12,
+
+    LOOK             = {
+        MAX_X = 96,
+        MAX_Y = 64,
+        DEADZONE = 0.25,
+        SMOOTHING = 18,
+    },
+
+    ZOOM             = {
+        AMOUNT = 0.35,
+        SMOOTHING = 14,
+    }
+}
+
+DEBUG = {
     -- Draw player's hitbox in red on top for clarity
     DRAW_PLAYER_HITBOX = false,
     HITBOX_FILL_ALPHA  = 0.15, -- How easy it is to see
