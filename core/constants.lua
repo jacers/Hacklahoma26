@@ -12,12 +12,12 @@ EDITOR_MOVE_SPEED = 200
 PLAYER            = {
     WIDTH               = 16,
     HEIGHT              = 16,
-    WALK_SPEED          = 180,
-    RUN_SPEED           = 300,
+    WALK_SPEED          = 90,
+    RUN_SPEED           = 180,
     ACCEL_GROUND        = 3000,
-    ACCEL_AIR           = 1400,
+    ACCEL_AIR           = 1000,
     FRICTION            = 2400,
-    GRAVITY             = 2600,
+    GRAVITY             = 3000,
     JUMP_VEL            = 760,
     FALL_MULT           = 1.35,
     LOW_JUMP_MULT       = 1.8,
@@ -33,7 +33,7 @@ PLAYER            = {
 
 DEBUG             = {
     -- Draw player's hitbox in red on top for clarity
-    DRAW_PLAYER_HITBOX = true,
+    DRAW_PLAYER_HITBOX = false,
     HITBOX_FILL_ALPHA  = 0.15, -- How easy it is to see
 }
 

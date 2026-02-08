@@ -134,17 +134,35 @@ function camera.update(dt)
     end
 
     -- Apply look
-    local desiredX = baseX + camera.look.x
-    local desiredY = baseY + camera.look.y
+    local desiredX = baseX
+    local desiredY = baseY
 
     if camera.bounds then
         local minX = camera.bounds.x
         local minY = camera.bounds.y
         local maxX = camera.bounds.x + camera.bounds.w - vw
         local maxY = camera.bounds.y + camera.bounds.h - vh
+
+        -- Allow look only if there's room in that direction
+        if camera.look.x < 0 and baseX > minX then
+            desiredX = baseX + camera.look.x
+        elseif camera.look.x > 0 and baseX < maxX then
+            desiredX = baseX + camera.look.x
+        end
+
+        if camera.look.y < 0 and baseY > minY then
+            desiredY = baseY + camera.look.y
+        elseif camera.look.y > 0 and baseY < maxY then
+            desiredY = baseY + camera.look.y
+        end
+
         desiredX = clamp(desiredX, minX, maxX)
         desiredY = clamp(desiredY, minY, maxY)
+    else
+        desiredX = baseX + camera.look.x
+        desiredY = baseY + camera.look.y
     end
+
 
     -- Smooth follow
     local t = 1 - math.exp(-camera.smoothing * dt)
