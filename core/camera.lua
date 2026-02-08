@@ -1,32 +1,41 @@
--- helpers/camera.lua
-local camera     = {}
+local camera           = {}
 
-camera.x         = 0
-camera.y         = 0
+camera.x               = 0
+camera.y               = 0
 
 -- Zoom
-camera.scale     = 2
-camera.baseScale = 2
-camera.minScale  = 0.75
-camera.maxScale  = 2.5
+camera.scale           = 2
+camera.baseScale       = 2
+camera.minScale        = 0.75
+camera.maxScale        = 2.5
 
-camera.zoom      = {
+camera.zoom            = {
     amount    = 0.35, -- how much R3 zooms in
     smoothing = 14,
     target    = 2
 }
 
 -- Follow behavior
-camera.target    = nil
-camera.smoothing = 12 -- higher = snappier
+camera.target          = nil
+camera.smoothing       = 12 -- higher = snappier
+
+-- Airborne follow (prevents disorienting jump camera)
+camera.air             = {
+    enabled = true,
+    -- 0 = freeze Y completely while airborne
+    -- 1 = follow Y perfectly
+    followY = 0.25,
+}
+
+camera.lastGroundBaseY = nil
 
 -- Bounds and viewport
-camera.bounds    = nil -- { x, y, w, h }
-camera.viewW     = nil
-camera.viewH     = nil
+camera.bounds          = nil -- { x, y, w, h }
+camera.viewW           = nil
+camera.viewH           = nil
 
 -- Look / aim (right stick nudge)
-camera.look      = {
+camera.look            = {
     enabled   = true,
     maxX      = 96,
     maxY      = 64,
@@ -45,6 +54,7 @@ end
 
 function camera.setTarget(entity)
     camera.target = entity
+    camera.lastGroundBaseY = nil
 end
 
 function camera.setBounds(x, y, w, h)
@@ -117,11 +127,25 @@ function camera.update(dt)
     local vw = camera.viewW / camera.scale
     local vh = camera.viewH / camera.scale
 
-    -- Base camera position
+    -- Base camera position (center target)
     local baseX =
         (camera.target.x + (camera.target.width or 0) / 2) - vw / 2
     local baseY =
         (camera.target.y + (camera.target.height or 0) / 2) - vh / 2
+
+    -- Airborne vertical dampening (prevents camera matching jump perfectly)
+    if camera.air.enabled then
+        local onGround = camera.target.onGround == true
+        if onGround then
+            camera.lastGroundBaseY = baseY
+        else
+            if camera.lastGroundBaseY == nil then
+                camera.lastGroundBaseY = baseY
+            end
+            local f = camera.air.followY or 0.25
+            baseY = camera.lastGroundBaseY + (baseY - camera.lastGroundBaseY) * f
+        end
+    end
 
     -- Clamp base
     if camera.bounds then
@@ -133,7 +157,7 @@ function camera.update(dt)
         baseY = clamp(baseY, minY, maxY)
     end
 
-    -- Apply look
+    -- Apply look (only if it won't fight bounds)
     local desiredX = baseX
     local desiredY = baseY
 
@@ -162,7 +186,6 @@ function camera.update(dt)
         desiredX = baseX + camera.look.x
         desiredY = baseY + camera.look.y
     end
-
 
     -- Smooth follow
     local t = 1 - math.exp(-camera.smoothing * dt)
@@ -195,6 +218,7 @@ function camera.reset(x, y)
     camera.zoom.target = camera.baseScale
     camera.look.x = 0
     camera.look.y = 0
+    camera.lastGroundBaseY = nil
 end
 
 -- Utilities

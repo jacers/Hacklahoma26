@@ -33,7 +33,7 @@ PLAYER            = {
 
 DEBUG             = {
     -- Draw player's hitbox in red on top for clarity
-    DRAW_PLAYER_HITBOX = false,
+    DRAW_PLAYER_HITBOX = true,
     HITBOX_FILL_ALPHA  = 0.15, -- How easy it is to see
 }
 
