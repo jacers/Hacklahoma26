@@ -48,7 +48,7 @@ function Player:new(x, y)
     self.facing        = 1 -- 1 = right, -1 = left
 
     -- Animation
-    self.anim          = Animation.new("assets/images/scissortail.png", {
+    self.anim          = Animation.new("assets/images/player/pinktail.png", {
         frameW = 23,
         frameH = 23,
         border = 1,
