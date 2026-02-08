@@ -12,9 +12,13 @@ local Player        = BaseEntity:extend()
 function Player:new(x, y)
     BaseEntity.new(self, "Player", x, y)
 
-    -- Size (no sprite yet)
+    -- Size
     self.width         = P.WIDTH
-    self.height        = P.HEIGHT -- Mario-sized!
+    self.height        = P.HEIGHT
+
+    -- Default hitbox sizee
+    self.baseHitW      = P.WIDTH
+    self.baseHitH      = P.HEIGHT
 
     -- Physics state
     self.vx            = 0
@@ -66,6 +70,26 @@ function Player:new(x, y)
     self.anim:play("stand", true)
 end
 
+-- Returns the collision hitbox AABB:
+--  - if PLAYER.TIGHT_SPRITE_HITBOX is true:
+--      left/right/top inset by HITBOX_INSET, bottom unchanged
+--  - else: uses PLAYER.WIDTH/HEIGHT centered at sprite bottom
+function Player:getHitbox()
+    if P.TIGHT_SPRITE_HITBOX then
+        local inset = P.HITBOX_INSET or 1
+        local hx = self.x + inset
+        local hy = self.y + inset
+        local hw = self.width - inset * 2
+        local hh = self.height - inset
+        return hx, hy, hw, hh
+    end
+
+    -- Mario-esc hitbox anchored to sprite bottom-center
+    local hx = self.x + (self.width - self.baseHitW) / 2
+    local hy = self.y + (self.height - self.baseHitH)
+    return hx, hy, self.baseHitW, self.baseHitH
+end
+
 local function approach(v, target, amount)
     if v < target then
         return math.min(v + amount, target)
@@ -77,17 +101,17 @@ end
 
 function Player:update(dt)
     -- Input
-    local move           = 0
+    local move     = 0
 
     -- Vertical intent (Mario behavior)
-    local upHeld         = keyboard.actionDown("up") or gamepad.down("up")
-    local downHeld       = keyboard.actionDown("down") or gamepad.down("down")
+    local upHeld   = keyboard.actionDown("up") or gamepad.down("up")
+    local downHeld = keyboard.actionDown("down") or gamepad.down("down")
 
     -- Raw horizontal intent (used for facing, even if movement is locked)
-    local rawX           = 0
+    local rawX     = 0
 
     -- Prefer analog stick if present
-    local axisX          = gamepad.moveX()
+    local axisX    = gamepad.moveX()
     if math.abs(axisX) > 0 then
         rawX = axisX
     else
@@ -103,8 +127,8 @@ function Player:update(dt)
     -- Movement locks:
     --  - Holding UP locks movement AND facing (look up)
     --  - Holding DOWN locks movement ONLY (crouch-turn is allowed)
-    local lockMove       = self.onGround and (upHeld or downHeld)
-    local lockFacing     = self.onGround and upHeld
+    local lockMove   = self.onGround and (upHeld or downHeld)
+    local lockFacing = self.onGround and upHeld
 
     -- Apply movement only if not locked
     if not lockMove then
@@ -120,7 +144,7 @@ function Player:update(dt)
     local accel       = self.onGround and self.accelGround or self.accelAir
 
     -- Turnaround / skid check (compute early so we can affect physics)
-    local turning = false
+    local turning     = false
     if self.onGround and runHeld and not lockMove then
         if (move < -0.2 and self.vx > 60) or (move > 0.2 and self.vx < -60) then
             turning = true
@@ -247,6 +271,25 @@ function Player:draw()
         0, 1, 1,
         ox, oy
     )
+
+    -- Debug hitbox overlay (red, drawn last/on top)
+    -- Debug hitbox overlay (red, drawn last/on top)
+    if DEBUG and DEBUG.DRAW_PLAYER_HITBOX then
+        local hx, hy, hw, hh = self:getHitbox()
+
+        -- Filled
+        local a = (DEBUG.HITBOX_FILL_ALPHA or 0.0)
+        if a > 0 then
+            love.graphics.setColor(1, 0, 0, a)
+            love.graphics.rectangle("fill", hx, hy, hw, hh)
+        end
+
+        -- Outline
+        love.graphics.setColor(1, 0, 0, 1)
+        love.graphics.rectangle("line", hx, hy, hw, hh)
+
+        love.graphics.setColor(1, 1, 1, 1)
+    end
 end
 
 return Player

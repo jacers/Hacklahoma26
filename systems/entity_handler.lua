@@ -3,13 +3,25 @@ local entities = {}
 
 local physics = require("systems.physics")
 
--- Axis-Aligned Bounding Box
+-- If an entity provides :getHitbox(), use it
+local function getBox(e)
+    if e and e.getHitbox then
+        local x, y, w, h = e:getHitbox()
+        return { x = x, y = y, w = w, h = h }
+    end
+    return { x = e.x, y = e.y, w = e.width, h = e.height }
+end
+
+-- Axis-Aligned Bounding Box (uses hitboxes if present)
 local function aabb(a, b)
+    local A = getBox(a)
+    local B = getBox(b)
+
     return
-        a.x < b.x + b.width and
-        a.x + a.width > b.x and
-        a.y < b.y + b.height and
-        a.y + a.height > b.y
+        A.x < B.x + B.w and
+        A.x + A.w > B.x and
+        A.y < B.y + B.h and
+        A.y + A.h > B.y
 end
 
 -- Birthing and living
@@ -44,7 +56,7 @@ function entityHandler.draw()
     end
 end
 
--- Picking
+-- Picking (editor)
 function entityHandler.pick(x, y)
     for i = #entities, 1, -1 do
         local e = entities[i]
@@ -92,15 +104,6 @@ function entityHandler.tryMove(entity, dx, dy)
     end
 
     return true
-end
-
--- Movement (editor group move)
-function entityHandler.moveAllByName(name, dx, dy)
-    for _, e in ipairs(entities) do
-        if e.name == name then
-            entityHandler.tryMove(e, dx, dy)
-        end
-    end
 end
 
 -- Platformer motion delegates to physics system
