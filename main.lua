@@ -1,31 +1,31 @@
-local game = require("game.game")
+local scene = require("scenes.gameplay.scene")
 
 function love.load()
-    game.load()
+    scene.load()
 end
 
 function love.update(dt)
-    game.update(dt)
+    scene.update(dt)
 end
 
 function love.draw()
-    game.draw()
+    scene.draw()
 end
 
 function love.keypressed(key)
-    game.keypressed(key)
+    scene.keypressed(key)
 end
 
 function love.gamepadpressed(joystick, button)
-    game.gamepadpressed(joystick, button)
+    scene.gamepadpressed(joystick, button)
 end
 
 function love.mousepressed(x, y, button)
-    game.mousepressed(x, y, button)
+    scene.mousepressed(x, y, button)
 end
 
 function love.resize(w, h)
-    game.resize(w, h)
+    scene.resize(w, h)
 end
 
 function love.errorhandler(msg)

@@ -1,4 +1,4 @@
-local entityHandler = require("helpers.entity_handler")
+local entityHandler = require("systems.entity_handler")
 
 local level_manager = {}
 

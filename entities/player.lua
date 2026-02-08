@@ -2,7 +2,7 @@ require("core.constants")
 local P = PLAYER
 
 local BaseEntity    = require("entities.entity")
-local entityHandler = require("helpers.entity_handler")
+local entityHandler = require("systems.entity_handler")
 local keyboard      = require("core.input.keyboard")
 local gamepad       = require("core.input.gamepad")
 

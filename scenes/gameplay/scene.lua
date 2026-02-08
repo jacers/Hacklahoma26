@@ -1,6 +1,6 @@
 require("core.constants")
 
-local entityHandler = require("helpers.entity_handler")
+local entityHandler = require("systems.entity_handler")
 local tick          = require("libraries.tick")
 
 local keyboard      = require("core.input.keyboard")
@@ -9,12 +9,12 @@ local gamepad       = require("core.input.gamepad")
 local window        = require("core.window")
 local camera        = require("core.camera")
 
-local levelManager  = require("game.level_manager")
-local editorFactory = require("game.editor")
+local levelManager  = require("scenes.gameplay.level_manager")
+local editorFactory = require("scenes.gameplay.editor")
 
-local game = {}
+local scene = {}
 
-function game.load()
+function scene.load()
     window.load()
 
     -- Camera uses virtual resolution
@@ -22,10 +22,10 @@ function game.load()
     camera.reset(0, 0)
 
     local ctx = levelManager.load(1)
-    game.player = ctx.player
+    scene.player = ctx.player
 
-    if game.player then
-        camera.setTarget(game.player)
+    if scene.player then
+        camera.setTarget(scene.player)
     end
     if ctx.bounds then
         camera.setBounds(ctx.bounds.x, ctx.bounds.y, ctx.bounds.w, ctx.bounds.h)
@@ -33,11 +33,11 @@ function game.load()
         camera.setBounds(0, 0, window.width, window.height)
     end
 
-    game.editor = editorFactory.new(entityHandler, keyboard, window)
-    game.editor:setPlayer(game.player)
+    scene.editor = editorFactory.new(entityHandler, keyboard, window)
+    scene.editor:setPlayer(scene.player)
 end
 
-function game.update(dt)
+function scene.update(dt)
     dt = math.min(dt, MAX_FRAME_DT)
 
     while dt > 0 do
@@ -48,12 +48,12 @@ function game.update(dt)
         entityHandler.update(sdt)
         levelManager.update(sdt)
 
-        game.editor:update(sdt)
+        scene.editor:update(sdt)
         camera.update(sdt)
     end
 end
 
-function game.draw()
+function scene.draw()
     window.beginDraw()
 
     -- World
@@ -62,41 +62,41 @@ function game.draw()
     camera.clear()
 
     -- UI / editor overlay (screen space)
-    game.editor:draw()
+    scene.editor:draw()
 
     window.endDraw()
 end
 
-function game.keypressed(key)
+function scene.keypressed(key)
     -- Let editor handle escape/tool toggles first
-    if game.editor:keypressed(key) then
+    if scene.editor:keypressed(key) then
         return
     end
 
     -- Jump buffer (keyboard)
-    if game.player and not game.editor:isSpawnMode() and keyboard.actionPressedAny(key, "jump") then
-        game.player:queueJump()
+    if scene.player and not scene.editor:isSpawnMode() and keyboard.actionPressedAny(key, "jump") then
+        scene.player:queueJump()
         return
     end
 end
 
-function game.gamepadpressed(joystick, button)
+function scene.gamepadpressed(joystick, button)
     -- Record the controller edge press so gamepad.pressed(action) can consume it
     gamepad.gamepadpressed(button)
 
     -- Jump buffer (controller)
-    if game.player and not game.editor:isSpawnMode() and keyboard.actionPressedAny(nil, "jump") then
-        game.player:queueJump()
+    if scene.player and not scene.editor:isSpawnMode() and keyboard.actionPressedAny(nil, "jump") then
+        scene.player:queueJump()
         return
     end
 end
 
-function game.mousepressed(x, y, button)
-    game.editor:mousepressed(x, y, button)
+function scene.mousepressed(x, y, button)
+    scene.editor:mousepressed(x, y, button)
 end
 
-function game.resize(w, h)
+function scene.resize(w, h)
     window.resizeGame(w, h)
 end
 
-return game
+return scene
